@@ -4,28 +4,82 @@ using UnityEngine;
 
 public class CameraOrbit : MonoBehaviour
 {
-    public PlayerMovement target;
+    /// <summary>
+    /// This variable holds reference to the camera.
+    /// </summary>
+    private Camera cam;
 
+    /// <summary>
+    /// This variable holds reference to the PlayerTargeting script
+    /// </summary>
+    private PlayerTargeting targetScript;
+
+    /// <summary>
+    /// Hold reference to the PlayerMovement script.
+    /// </summary>
+    public PlayerMovement moveScript;
+
+    /// <summary>
+    /// This variable holds the camera's yaw.
+    /// </summary>
     private float yaw = 0;
+
+    /// <summary>
+    /// This variable holds the camera's pitch.
+    /// </summary>
     private float pitch = 0;
 
+    /// <summary>
+    /// These two variables hold the camera's sensitivity.
+    /// </summary>
     public float cameraSensitivityX = 10;
     public float cameraSensitivityY = 10;
 
-    void Start()
+    private void Start()
     {
+        targetScript = moveScript.GetComponent<PlayerTargeting>();
+        cam = GetComponentInChildren<Camera>();
         
     }
 
-    
     void Update()
     {
-        RotateCamera();
+        PlayerOrbitCamera();
 
-        transform.position = target.transform.position;
+        transform.position = moveScript.transform.position;
+
+        // If aiming, set camera rotation to look at target.
+        RotateCamToLookAtTarget();
+
+        // Move the camera closer to the player.
+        ZoomCamera();
     }
 
-    private void RotateCamera()
+    /// <summary>
+    /// This function zooms the camera behind the player when they target something.
+    /// </summary>
+    private void ZoomCamera()
+    {
+        float dis = 10;
+        if (IsTargeting()) dis = 3;
+
+        // Slide the camera's position to the new zoomed position.
+        cam.transform.localPosition = AnimMath.Slide(cam.transform.localPosition, new Vector3(0, 0, -dis), .001f);
+    }
+
+    /// <summary>
+    /// This function checks to see if the player is targeting something or not.
+    /// </summary>
+    /// <returns></returns>
+    private bool IsTargeting()
+    {
+        return (targetScript && targetScript.target != null && targetScript.wantsToTarget);
+    }
+
+    /// <summary>
+    /// This function uses the MouseX and MouseY axis to rotate the camera's rig.
+    /// </summary>
+    private void PlayerOrbitCamera()
     {
         float mX = Input.GetAxisRaw("Mouse X");
         float mY = Input.GetAxisRaw("Mouse Y");
@@ -33,8 +87,43 @@ public class CameraOrbit : MonoBehaviour
         yaw += mX * cameraSensitivityX;
         pitch += mY * cameraSensitivityY;
 
-        pitch = Mathf.Clamp(pitch, -89, 89);
+        if (IsTargeting()) // z-targeting
+        {
+            pitch = Mathf.Clamp(pitch, 15, 60);
 
-        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+            float playerYaw = moveScript.transform.eulerAngles.y;
+            yaw = Mathf.Clamp(yaw, playerYaw - 40, playerYaw + 40);
+        }
+        else // Not targeting
+        {
+            pitch = Mathf.Clamp(pitch, -10, 89);
+        }
+
+        // Ease to the clamped range.
+        transform.rotation = AnimMath.Slide(transform.rotation, Quaternion.Euler(pitch, yaw, 0), .001f);
+    }
+
+    /// <summary>
+    /// This function rotates the camera when the player is targeting something.
+    /// </summary>
+    private void RotateCamToLookAtTarget()
+    {
+        if (IsTargeting())
+        {
+            // If targeting, set rotation to look at target.
+            Vector3 vToTarget = targetScript.target.position - cam.transform.position;
+
+            Quaternion targetRot = Quaternion.LookRotation(vToTarget, Vector3.up);
+
+            // Ease towards the target rotation
+            cam.transform.rotation = AnimMath.Slide(cam.transform.rotation, targetRot, .001f);
+        }
+        else
+        {
+            // If not targeting, reset rotation.
+            // Ease back to the identity.
+            cam.transform.localRotation = AnimMath.Slide(cam.transform.localRotation, Quaternion.identity, .001f); 
+        }
+
     }
 }

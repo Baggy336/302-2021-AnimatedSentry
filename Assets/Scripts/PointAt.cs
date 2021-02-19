@@ -9,8 +9,14 @@ public class PointAt : MonoBehaviour
     /// </summary>
     private PlayerTargeting playerTargeting;
 
+    /// <summary>
+    /// This variable holds the player's bones starting rotation.
+    /// </summary>
     private Quaternion startingRot;
 
+    /// <summary>
+    /// These three booleans are used to lock the player's looking axis.
+    /// </summary>
     public bool lockRotationX;
     public bool lockRotationY;
     public bool lockRotationZ;
@@ -33,7 +39,6 @@ public class PointAt : MonoBehaviour
     {
         if (playerTargeting && playerTargeting.target && playerTargeting.wantsToTarget)
         {
-            print("I am running!");
             // Get the distance from the player's current location to the target
             Vector3 disToTarget = playerTargeting.target.position - transform.position;
 
