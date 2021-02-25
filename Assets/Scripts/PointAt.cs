@@ -25,7 +25,6 @@ public class PointAt : MonoBehaviour
     {
         startingRot = transform.localRotation;
         playerTargeting = GetComponentInParent<PlayerTargeting>();
-        print(playerTargeting);
     }
     void Update()
     {
@@ -62,7 +61,6 @@ public class PointAt : MonoBehaviour
         }
         else
         {
-            print("Hello");
             // Figure out bone rotation when there is no target
             transform.localRotation = AnimMath.Slide(transform.localRotation, startingRot, .05f);
         }
