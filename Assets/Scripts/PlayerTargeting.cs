@@ -5,15 +5,29 @@ using UnityEngine;
 
 public class PlayerTargeting : MonoBehaviour
 {
+    CameraOrbit camOrbit;
+
     /// <summary>
     /// This is the player's current target.
     /// </summary>
     public Transform target;
 
+    public Transform armLeft;
+    public Transform armRight;
+
+    private Vector3 startPosArmLeft;
+    private Vector3 startPosArmRight;
+
+    public ParticleSystem prefabMuzzleFlash;
+    public Transform handRight;
+    public Transform handLeft;
+
     /// <summary>
     /// This variable returns if the player wants to target an object or not.
     /// </summary>
     public bool wantsToTarget = false;
+
+    public bool wantsToAttack = false;
 
     /// <summary>
     /// This variable is how far away an object can be for the player to see it.
@@ -40,14 +54,25 @@ public class PlayerTargeting : MonoBehaviour
     /// </summary>
     float cooldownPick = 0;
 
+    float cooldownShoot = 0;
+
+    public float RPS = 4;
+
     void Start()
     {
         // Lock the mouse cursor to the edges of the screen
         Cursor.lockState = CursorLockMode.Locked;
+
+        camOrbit = Camera.main.GetComponentInParent<CameraOrbit>();
+
+        startPosArmLeft = armLeft.localPosition;
+        startPosArmRight = armRight.localPosition;
     }
     void Update()
     {
         wantsToTarget = Input.GetButton("Fire2"); // Get the input for the right mouse click
+        wantsToAttack = Input.GetButton("Fire1"); // Get the input for the left mouse click
+
 
         if (!wantsToTarget) target = null; // As soon as the player releases the mouse button, stop targeting.
 
@@ -57,8 +82,54 @@ public class PlayerTargeting : MonoBehaviour
         cooldownPick -= Time.deltaTime;
         if (cooldownPick <= 0) PickATarget();
 
+        if (cooldownShoot > 0) cooldownShoot -= Time.deltaTime;
+
         // If we can't see the target, there is no target.
         if (target && CanSeeThing(target) == false) target = null;
+
+        SlideArmsHome();
+
+        DoAttack();
+    }
+
+    private void DoAttack()
+    {
+        if (cooldownShoot > 0) return;
+        if (!wantsToTarget) return;
+        if (!wantsToAttack) return;
+        if (target == null) return;
+        if (!CanSeeThing(target)) return;
+
+        HealthSystem targetHealth = target.GetComponent<HealthSystem>();
+
+        if (targetHealth)
+        {
+            targetHealth.TakeDamage(20);
+        }
+
+        cooldownShoot = 1 / RPS;
+        // Attack
+        camOrbit.Shake(.5f);
+
+        // Where to spawn the particle system
+        if (handRight) Instantiate(prefabMuzzleFlash, handRight.position, handRight.rotation);
+        if (handLeft) Instantiate(prefabMuzzleFlash, handLeft.position, handLeft.rotation);
+
+        // Trigger arm anim
+        // Rotate the arms up
+        armLeft.localEulerAngles += new Vector3(-20, 0, 0);
+        armRight.localEulerAngles += new Vector3(-20, 0, 0);
+
+        // Move the arms backwards
+        armLeft.position += -armLeft.forward * .1f;
+        armRight.position += -armRight.forward * .1f;
+    }
+
+    private void SlideArmsHome()
+    {
+        armLeft.localPosition = AnimMath.Slide(armLeft.localPosition, startPosArmLeft, .001f);
+        armRight.localPosition = AnimMath.Slide(armRight.localPosition, startPosArmRight, .001f);
+
     }
 
     /// <summary>

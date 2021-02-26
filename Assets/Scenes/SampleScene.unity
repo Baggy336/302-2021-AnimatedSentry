@@ -128,7 +128,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5484171757492671241, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
   m_PrefabInstance: {fileID: 3458228923127548691}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1498147668}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b46135c90593ca64989185be024859ba, type: 3}
@@ -462,6 +462,23 @@ MonoBehaviour:
   lockRotationX: 0
   lockRotationY: 0
   lockRotationZ: 0
+--- !u!1 &1498147668 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3458228923250891755, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
+  m_PrefabInstance: {fileID: 3458228923127548691}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1498147672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1498147668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0085657b28eb18242974f7fe70115c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1817548952
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +816,14 @@ PrefabInstance:
     - target: {fileID: 3458228923250891755, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
       propertyPath: m_Name
       value: The Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484171757492671241, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
+      propertyPath: gravityMult
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484171757492671241, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
+      propertyPath: jumpImpulse
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 6683771036398565446, guid: 84d2bbb19000a2441b8bea7a2b517b5b, type: 3}
       propertyPath: target

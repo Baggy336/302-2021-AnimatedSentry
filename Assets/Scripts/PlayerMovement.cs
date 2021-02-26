@@ -22,10 +22,30 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 inputDirection = new Vector3();
 
+    private float timeLeftGrounded = 0;
+
+    public bool isGrounded
+    {
+        get
+        { // Return true if the pawn thinks we are grounded, or if the timer is 0
+            return pawn.isGrounded || timeLeftGrounded > 0;
+        }
+    }
+
     /// <summary>
     /// How fast the player is currently moving, vertically in m/s.
     /// </summary>
     private float verticalVel = 0;
+
+    /// <summary>
+    /// How high the player can jump
+    /// </summary>
+    public float jumpImpulse = 5;
+
+    /// <summary>
+    /// The amount of force down on the player
+    /// </summary>
+    public float gravityMult = 10;
 
     /// <summary>
     /// This variable holds how fast the player can move.
@@ -38,8 +58,12 @@ public class PlayerMovement : MonoBehaviour
     }
     void Update()
     {
+        // Countdown timeLeftGrounded
+        if (timeLeftGrounded > 0) timeLeftGrounded -= Time.deltaTime;
+
         MovePlayer();
-        WiggleLegs();
+        if (isGrounded) WiggleLegs(); // Idle + walk
+        else AirLegs(); // Jump (or falling)
     }
 
     /// <summary>
@@ -49,6 +73,8 @@ public class PlayerMovement : MonoBehaviour
     {
         float h = Input.GetAxis("Horizontal"); // Side to side
         float v = Input.GetAxis("Vertical"); // Front to back
+        bool isJumpHeld = Input.GetButton("Jump"); // Every frame the button is held down
+        bool OnJumpPressed = Input.GetButtonDown("Jump"); // The frame the button was pressed
 
         //float yawOfInput = Mathf.Atan2(v, h); // In radians
         //float yawOfCam = cam.transform.eulerAngles.y; // In Degrees
@@ -67,14 +93,24 @@ public class PlayerMovement : MonoBehaviour
         if (inputDirection.sqrMagnitude > 1) inputDirection.Normalize(); // Make the value 1
 
         // Apply gravity
-        verticalVel += 10 * Time.deltaTime;
+        verticalVel += gravityMult * Time.deltaTime;
 
         // Pass all movement information to the CharacterController
         pawn.Move(inputDirection * walkSpeed * Time.deltaTime + verticalVel * Vector3.down * Time.deltaTime);
 
-        if (pawn.isGrounded) // If the player is touching the ground, set verticalVel to 0.
+        if (pawn.isGrounded)
         {
             verticalVel = 0;
+            timeLeftGrounded = .2f;
+        }
+
+        if (isGrounded) // If the player is touching the ground, set verticalVel to 0.
+        {
+            if (isJumpHeld)
+            {
+                verticalVel = -jumpImpulse;
+                timeLeftGrounded = 0; // Not on ground anymore
+            }
         }
     }
 
@@ -110,5 +146,11 @@ public class PlayerMovement : MonoBehaviour
 
         leg1.localRotation = AnimMath.Slide(leg1.localRotation, Quaternion.AngleAxis(wave, axis), .001f);
         leg2.localRotation = AnimMath.Slide(leg2.localRotation, Quaternion.AngleAxis(-wave, axis), .001f);
+    }
+
+    private void AirLegs()
+    {
+        leg1.localRotation = AnimMath.Slide(leg1.localRotation, Quaternion.Euler(30, 0, 0), .001f);
+        leg2.localRotation = AnimMath.Slide(leg2.localRotation, Quaternion.Euler(-30, 0, 0), .001f);
     }
 }

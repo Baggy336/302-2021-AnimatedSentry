@@ -29,6 +29,8 @@ public class CameraOrbit : MonoBehaviour
     /// </summary>
     private float pitch = 0;
 
+    public float shakeIntensity = 0;
+
     /// <summary>
     /// These two variables hold the camera's sensitivity.
     /// </summary>
@@ -53,6 +55,34 @@ public class CameraOrbit : MonoBehaviour
 
         // Move the camera closer to the player.
         ZoomCamera();
+
+        ShakeCamera();
+    }
+
+    public void Shake(float intensity = 1)
+    {
+        if (intensity > 1)
+        {
+            shakeIntensity = intensity;
+        }
+        else
+        {
+            shakeIntensity += intensity;
+            if (shakeIntensity > 1) shakeIntensity = 1;
+        }
+    }
+    private void ShakeCamera()
+    {
+        if (shakeIntensity < 0) shakeIntensity = 0;
+        if (shakeIntensity > 0) shakeIntensity -= Time.deltaTime;
+        else return; // shake intensity is 0
+
+        // Pick a small random rotation
+        Quaternion targetRot = AnimMath.Lerp(Random.rotation, Quaternion.identity, .995f);
+
+        //cam.transform.localRotation *= targetRot;
+        cam.transform.localRotation = AnimMath.Lerp(cam.transform.localRotation, cam.transform.localRotation * targetRot, shakeIntensity * shakeIntensity);
+
     }
 
     /// <summary>
