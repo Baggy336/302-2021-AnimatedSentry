@@ -14,6 +14,10 @@ public class SentryTargeting : MonoBehaviour
     /// </summary>
     public Transform targetPlayer;
 
+    public PlayerMovement pm;
+
+    private Vector3 vToPlayer;
+
     float orbit = 0;
 
     /// <summary>
@@ -24,59 +28,46 @@ public class SentryTargeting : MonoBehaviour
     /// <summary>
     /// The angle in which the sentry can see.
     /// </summary>
-    float visCone = 50;
+    float visCone = 360;
 
-    float cooldownScan = 0;
-
-    float cooldownPick = 0;
-
-    private List<TargetPlayer> players = new List<TargetPlayer>();
+    public bool isTargetingPlayer = false;
 
     private void Update()
     {
-        if (!targetPlayer)
+        TargetThePlayer();
+
+    }
+
+    private void TargetThePlayer()
+    {
+        vToPlayer = targetPlayer.transform.position - transform.position;
+
+        if (vToPlayer.sqrMagnitude > visDis * visDis) isTargetingPlayer = false;
+        if (Vector3.Angle(transform.forward, vToPlayer) > visCone) isTargetingPlayer = false;
+
+        if (vToPlayer.sqrMagnitude < visDis * visDis && Vector3.Angle(transform.forward, vToPlayer) < visCone) isTargetingPlayer = true;
+
+        if (isTargetingPlayer)
+        {
+            // Store the look rotation in a quaternion
+            Quaternion targetRot = Quaternion.LookRotation(vToPlayer, Vector3.up);
+
+            // Get local Euler angles before rotation
+            Vector3 euler1 = rotationPiece.transform.localEulerAngles;
+            Quaternion prevRot = rotationPiece.transform.rotation;
+            rotationPiece.transform.rotation = targetRot; // Set rotation
+            Vector3 euler2 = rotationPiece.transform.localEulerAngles; // Get local angles after rotation
+
+            rotationPiece.transform.rotation = prevRot; // Revert rotation
+
+            // Use the quaternion with our slide function to ease the rotation towards the target
+            rotationPiece.transform.localRotation = AnimMath.Slide(rotationPiece.transform.localRotation, Quaternion.Euler(euler2), .01f);
+        }
+
+        else
         {
             orbit += .5f;
             rotationPiece.localRotation = Quaternion.Euler(0, orbit, 0);
-        }
-    }
-    /// <summary>
-    /// This function returns true/false based on if the sentry can see the player.
-    /// </summary>
-    /// <returns></returns>
-    private bool CanSeePlayer(Transform player)
-    {
-        if (!player) return false; // If there is no player.
-
-        // Get the current direction to the player.
-        Vector3 vectorToPlayer = player.position - transform.position;
-
-        // Check distance
-        if (vectorToPlayer.sqrMagnitude > visDis * visDis) return false; // Too far away
-
-        // Check the vision cone
-        if (Vector3.Angle(transform.forward, vectorToPlayer) > visCone) return false; //The player is outside of the vision cone.
-
-        return true;
-    }
-
-    /// <summary>
-    /// This function scans for the player.
-    /// </summary>
-    private void LookForPlayer()
-    {
-        cooldownScan = 1; // Do next scan in 1 second
-
-        players.Clear(); // empty the list.
-
-        TargetPlayer[] things = GameObject.FindObjectsOfType<TargetPlayer>();
-
-        foreach (TargetPlayer player in things)
-        {
-            if (CanSeePlayer(player.transform))
-            {
-                players.Add(player);
-            }
         }
     }
 }

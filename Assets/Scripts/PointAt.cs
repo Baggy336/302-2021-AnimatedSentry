@@ -34,7 +34,7 @@ public class PointAt : MonoBehaviour
     /// <summary>
     /// This function calculates and turns the player towards the current target.
     /// </summary>
-    private void TurnTowardsTarget()
+    public void TurnTowardsTarget()
     {
         if (playerTargeting && playerTargeting.target && playerTargeting.wantsToTarget)
         {
