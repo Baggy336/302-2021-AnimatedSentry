@@ -20,6 +20,7 @@ public class TurretTargeting : MonoBehaviour
 
     public ParticleSystem prefabMuzzleFlash;
     public Projectile prefabProjectile;
+
     //private Projectile projectile;
 
     private Vector3 vToPlayer;
@@ -76,6 +77,8 @@ public class TurretTargeting : MonoBehaviour
 
         if (cooldownShoot > 0) return;
         if (!isTargetingPlayer) return;
+        if (!targetPlayer) return;
+        if (!targetSentry) return;
 
         cooldownShoot = 1 / roundsPerSecond;
 
@@ -109,6 +112,9 @@ public class TurretTargeting : MonoBehaviour
 
     private void TargetPlayer()
     {
+        if (!targetPlayer) return;
+        if (!targetSentry) return;
+
         vToPlayer = targetPlayer.transform.position - transform.position;
         vToSentry = targetSentry.transform.position - transform.position;
 

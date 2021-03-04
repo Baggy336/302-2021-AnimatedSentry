@@ -38,6 +38,8 @@ public class SentryTargeting : MonoBehaviour
 
     private void TargetThePlayer()
     {
+        if (!targetPlayer) return; 
+
         vToPlayer = targetPlayer.transform.position - transform.position;
 
         if (vToPlayer.sqrMagnitude > visDis * visDis) isTargetingPlayer = false;
