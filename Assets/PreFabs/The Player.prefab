@@ -540,6 +540,7 @@ MonoBehaviour:
   armLeft: {fileID: 973798952976757834}
   armRight: {fileID: 5896592329318146637}
   prefabMuzzleFlash: {fileID: 5365986506656586736, guid: 3e52effebf85299449a94a4e7109f91c, type: 3}
+  prefabProjectile: {fileID: 8011076583670536009, guid: e5ae482ef3fb6b8479d66d560237c603, type: 3}
   handRight: {fileID: 6441624232830766783}
   handLeft: {fileID: 0}
   wantsToTarget: 0

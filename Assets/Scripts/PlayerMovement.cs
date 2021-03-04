@@ -51,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
     /// This variable holds how fast the player can move.
     /// </summary>
     public float walkSpeed = 4;
+
     void Start()
     {
         cam = Camera.main;

@@ -19,6 +19,8 @@ public class TurretTargeting : MonoBehaviour
     public Transform barrelRight;
 
     public ParticleSystem prefabMuzzleFlash;
+    public Projectile prefabProjectile;
+    //private Projectile projectile;
 
     private Vector3 vToPlayer;
 
@@ -70,6 +72,8 @@ public class TurretTargeting : MonoBehaviour
 
     private void ShootAtPlayer()
     {
+        Projectile projectile;
+
         if (cooldownShoot > 0) return;
         if (!isTargetingPlayer) return;
 
@@ -78,6 +82,20 @@ public class TurretTargeting : MonoBehaviour
         // Where to spawn the particle system
         if (nozzleRight) Instantiate(prefabMuzzleFlash, nozzleRight.position, nozzleRight.rotation);
         if (nozzleLeft) Instantiate(prefabMuzzleFlash, nozzleLeft.position, nozzleLeft.rotation);
+
+        // Where to spawn the projectile
+        if (nozzleRight)
+        {
+            projectile = Instantiate(prefabProjectile, nozzleRight.position, nozzleRight.rotation);
+            projectile.target = targetPlayer;
+        }
+        if (nozzleLeft)
+        {
+            projectile = Instantiate(prefabProjectile, nozzleLeft.position, nozzleLeft.rotation);
+            projectile.target = targetPlayer;
+        }
+
+
 
         // Trigger arm anim
         // Rotate the arms up

@@ -19,6 +19,8 @@ public class PlayerTargeting : MonoBehaviour
     private Vector3 startPosArmRight;
 
     public ParticleSystem prefabMuzzleFlash;
+    public Projectile prefabProjectile;
+
     public Transform handRight;
     public Transform handLeft;
 
@@ -94,18 +96,13 @@ public class PlayerTargeting : MonoBehaviour
 
     private void DoAttack()
     {
+        Projectile projectile;
+
         if (cooldownShoot > 0) return;
         if (!wantsToTarget) return;
         if (!wantsToAttack) return;
         if (target == null) return;
         if (!CanSeeThing(target)) return;
-
-        HealthSystem targetHealth = target.GetComponent<HealthSystem>();
-
-        if (targetHealth)
-        {
-            targetHealth.TakeDamage(20);
-        }
 
         cooldownShoot = 1 / RPS;
         // Attack
@@ -114,6 +111,17 @@ public class PlayerTargeting : MonoBehaviour
         // Where to spawn the particle system
         if (handRight) Instantiate(prefabMuzzleFlash, handRight.position, handRight.rotation);
         if (handLeft) Instantiate(prefabMuzzleFlash, handLeft.position, handLeft.rotation);
+
+        if (handRight)
+        {
+            projectile = Instantiate(prefabProjectile, handRight.position, handRight.rotation);
+            projectile.target = target;
+        }
+        if (handLeft)
+        {
+            projectile = Instantiate(prefabProjectile, handLeft.position, handLeft.rotation);
+            projectile.target = target;
+        }
 
         // Trigger arm anim
         // Rotate the arms up
