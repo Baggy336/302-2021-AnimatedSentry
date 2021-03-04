@@ -8,16 +8,20 @@ public class Projectile : MonoBehaviour
 
     public Vector3 vToPlayer;
 
-    float speed = 5;
+    float speed = 7;
+
+    float destroyCountdown = 0;
 
     private void Start()
     {
+        destroyCountdown = 4;
         vToPlayer = (target.position - transform.position).normalized;
     }
 
     private void Update()
     {
         transform.position += vToPlayer * speed * Time.deltaTime;
+        DestroyAfterTime();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -39,9 +43,15 @@ public class Projectile : MonoBehaviour
             HealthSystem targetHealth = target.GetComponent<HealthSystem>();
             if (targetHealth)
             {
-                targetHealth.TakeDamage(20);
+                targetHealth.TakeDamage(5);
             }
             Destroy(gameObject);
         }
+    }
+
+    void DestroyAfterTime()
+    {
+        destroyCountdown -= Time.deltaTime;
+        if (destroyCountdown <= 0) Destroy(gameObject);
     }
 }

@@ -14,8 +14,6 @@ public class SentryTargeting : MonoBehaviour
     /// </summary>
     public Transform targetPlayer;
 
-    public PlayerMovement pm;
-
     private Vector3 vToPlayer;
 
     float orbit = 0;

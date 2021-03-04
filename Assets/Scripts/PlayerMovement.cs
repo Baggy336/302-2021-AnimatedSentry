@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         pawn = GetComponent<CharacterController>();
     }
     void Update()
-    {
+    { 
         // Countdown timeLeftGrounded
         if (timeLeftGrounded > 0) timeLeftGrounded -= Time.deltaTime;
 

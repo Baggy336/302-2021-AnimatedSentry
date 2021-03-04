@@ -8,6 +8,8 @@ public class HealthSystem : MonoBehaviour
 
     public float healthMax = 100;
 
+    SentryTargeting turret;
+
     private void Start()
     {
         health = healthMax;
